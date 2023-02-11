@@ -27,6 +27,37 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <ctype.h>
 #include <stdlib.h>
 
+#ifndef ARDUINO
+// Enable use of this library on non-Arduino targets by defining symbols that are
+// normally provided by the Arduino standard headers (Arduino.h/WProgram.h).
+
+typedef uint8_t byte;
+
+
+#define _USE_MATH_DEFINES
+#include <cmath>
+#include <chrono>
+
+#define TWO_PI 6.283185307179586476925286766559
+#define DEG_TO_RAD 0.017453292519943295769236907684886
+#define RAD_TO_DEG 57.295779513082320876798154814105
+
+#define radians(deg) ((deg)*DEG_TO_RAD)
+#define degrees(rad) ((rad)*RAD_TO_DEG)
+#define sq(x)        ((x)*(x))
+
+unsigned long millis()
+{
+   // Standards-compliant replacement for Arduino-specific millis() function:
+   // uses C++11's std::chrono::steady_clock, which is roughly equivalent
+   // to clock_gettime(CLOCK_MONOTONIC, ...) in POSIX C.
+    using namespace std::chrono;
+    const auto now = time_point_cast<milliseconds>(system_clock::now());
+    const auto ms  = now.time_since_epoch().count();
+    return static_cast<unsigned long>(ms);
+}
+#endif  // !ARDUINO
+
 #define _GPRMCterm   "GPRMC"
 #define _GPGGAterm   "GPGGA"
 #define _GNRMCterm   "GNRMC"
